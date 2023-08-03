@@ -1,0 +1,24 @@
+{% extends 'layouts/base.html' %}
+{% block body %}
+<head>
+    <link href="{{ url_for('static', filename='css/login.css') }}" rel="stylesheet">
+</head>
+<h1>Rejestracja</h1>
+<form action="/api/search_login" method="post" enctype="multipart/form-data" autocomplete="off">
+    <div class="container">
+        <label for="login">Login</label>
+        <input name="login" placeholder="Login" required type="text" oninput="is_login_available(this.value)">
+        <p id="login_available"></p>
+        <p id="login_not_available"></p>
+        <label for="password">Hasło</label>
+        <input name="password" placeholder="Hasło" required type="password">
+        <label for="rpt_password">Powtórz hasło</label>
+        <input name="rpt_password" placeholder="Powtórz hasło" required type="password">
+
+        <a href="/login">Masz już konto? Zaloguj się</a>
+
+        <button type="submit">Zaloguj się</button>
+    </div>
+</form>
+<script src="../../static/script/script.js"></script>
+{% endblock %}

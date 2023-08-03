@@ -1,0 +1,19 @@
+{% extends 'layouts/base.html' %}
+{% block body %}
+<head>
+    <link href="{{ url_for('static', filename='css/login.css') }}" rel="stylesheet">
+</head>
+<h1>Logowanie</h1>
+<form action="/api/search_login" method="post" enctype="multipart/form-data">
+    <div class="container">
+        <label for="login">Login</label>
+        <input name="login" placeholder="Login" required type="text">
+        <label for="password">Hasło</label>
+        <input name="password" placeholder="Hasło" required type="password">
+        <a href="/sign-up">Nie masz konta? Zarejestruj się</a>
+
+        <button type="submit">Zaloguj się</button>
+    </div>
+</form>
+<p>{{ note }}</p>
+{% endblock %}
