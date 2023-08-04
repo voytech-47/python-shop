@@ -1,3 +1,9 @@
+if (document.cookie.match("note") == null) {
+    document.getElementById(("note").style.display = "none")
+} else {
+    document.getElementById("note").style.display = "block"
+}
+
 let timer;
 
 function is_login_available(login) {

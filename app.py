@@ -15,6 +15,7 @@ def index():
 
 @app.route("/login")
 def login():
+    note = ""
     try:
         note = request.cookies.get("note")
     except:
@@ -38,9 +39,16 @@ def login_api():
         cursor = connect.cursor()
         cursor.execute("SELECT login, password FROM users")
         users = cursor.fetchall()
-        logins = [login for login, _ in users]
         user_login = request.form.get("login")
-        if user_login not in logins:
+        user_password = request.form.get("password")
+        search_user = filter(lambda x: x[0] == user_login, users)
+        search_result = next(search_user, None)
+        if search_result is None:
+            return failed_login()
+        hashing = hashlib.sha3_256()
+        hashing.update(user_password.encode("utf8"))
+        hashed_user_password = hashing.hexdigest()
+        if hashed_user_password != search_result[1]:
             return failed_login()
         response = redirect("/")
         response.set_cookie("login", user_login)
@@ -80,7 +88,7 @@ def signup_api():
 
 
 @app.route("/api/is_login_available", methods=["POST"])
-def is_login_abailable():
+def is_login_available():
     try:
         host = "localhost"
         user = "root"
@@ -94,11 +102,19 @@ def is_login_abailable():
         user_login = request.get_json()
         if user_login["login"] in logins:
             return Response(status=418)
+
         return Response(status=200)
     except:
         return Response(
             response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
             status=500)
+
+
+@app.route("/log-out")
+def log_out():
+    response = redirect("/login")
+    response.delete_cookie("login")
+    return response
 
 
 def failed_login():

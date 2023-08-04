@@ -1,3 +1,11 @@
 <div id="banner">
-    <p>Sklep</p>
+    <div id="left">
+        <p>Sklep</p>
+    </div>
+    <div id="right">
+        {% if login is defined %}
+        <p>Zalogowany użytkownik: <i>{{ login }}</i></p>
+        <a href="/log-out">Wyloguj</a>
+        {% endif %}
+    </div>
 </div>
