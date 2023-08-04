@@ -4,20 +4,21 @@
     <link href="{{ url_for('static', filename='css/login.css') }}" rel="stylesheet">
 </head>
 <h1>Rejestracja</h1>
-<form action="/api/search_login" method="post" enctype="multipart/form-data" autocomplete="off">
+<form action="/api/sign_up" autocomplete="off" enctype="multipart/form-data" id="signup-form" onsubmit="return check_form()" method="post">
     <div class="container">
         <label for="login">Login</label>
-        <input name="login" placeholder="Login" required type="text" oninput="is_login_available(this.value)">
+        <input id="login" name="login" oninput="is_login_available(this.value)" placeholder="Login" required
+               type="text">
         <p id="login_available"></p>
         <p id="login_not_available"></p>
         <label for="password">Hasło</label>
-        <input name="password" placeholder="Hasło" required type="password">
+        <input id="password" name="password" placeholder="Hasło" required type="password">
         <label for="rpt_password">Powtórz hasło</label>
-        <input name="rpt_password" placeholder="Powtórz hasło" required type="password">
-
+        <input id="rpt_password" name="rpt_password" placeholder="Powtórz hasło" required type="password">
+        <p id="passwords_not_identical">❌ hasła nie są takie same</p>
         <a href="/login">Masz już konto? Zaloguj się</a>
 
-        <button type="submit">Zaloguj się</button>
+        <button class="not-allowed" id="submit" type="submit">Zarejestruj się</button>
     </div>
 </form>
 <script src="../../static/script/script.js"></script>
