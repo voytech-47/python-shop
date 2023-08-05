@@ -10,9 +10,9 @@
         <div class="item">
             <div class="top">
                 {% if item[3] == "" %}
-                <img alt="{{ item[1] }}" class="item_img" src="{{ url_for('static', filename='placeholder.png') }}">
+                <img alt="{{ item[1] }}" class="item-img" src="{{ url_for('static', filename='placeholder.png') }}">
                 {% else %}
-                <img alt="{{ item[1] }}" class="item_img" src="{{ item[3] }}">
+                <img alt="{{ item[1] }}" class="item-img" src="{{ item[3] }}">
                 {% endif %}
                 <p>{{item[1]}}</p>
                 <button class="delete">🗑️</button>
@@ -20,13 +20,15 @@
             <div class="bottom">
                 <div class="amount-button">
                     <div class="minus-wrap {{item[0]}}">
-                        <p>-</p>
+                        <p class="minus {{item[0]}}" onload="console.log('loaded')">-</p>
                     </div>
-                    <div class="amount">
-                        <p>{{item[4]}}</p>
+                    <div class="amount-wrap">
+                        <input class="amount {{item[0]}}" min="1" name="amount-input"
+                               onfocusout="check_amount(this)" oninput="change_amount(this)"
+                               type="number" value="{{item[4]}}">
                     </div>
                     <div class="plus-wrap {{item[0]}}">
-                        <p>+</p>
+                        <p class="plus {{item[0]}}">+</p>
                     </div>
                 </div>
                 <p class="price">{{item[2] * item[4]}} zł ({{item[4]}} * {{item[2]}} zł)</p>

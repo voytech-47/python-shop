@@ -175,3 +175,8 @@ def failed_login():
 
 if __name__ == '__main__':
     app.run()
+
+# tooltip dodano do koszyka
+# usuwanie z koszyka
+# dynamiczna zmiana ilości przedmiotów
+#

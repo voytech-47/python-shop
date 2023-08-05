@@ -107,3 +107,15 @@ function get_cookie(name) {
 function set_cookie(name, value) {
     document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; path=/`;
 }
+
+function change_amount(field) {
+    if (field.value === 0) {
+        field.value = 1
+    }
+}
+
+function check_amount(field) {
+    if (field.value < 1) {
+        field.value = 1
+    }
+}

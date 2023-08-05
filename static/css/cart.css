@@ -1,4 +1,4 @@
-.item_img {
+.item-img {
     max-width: 90px;
     padding: 10px;
 }
@@ -51,7 +51,6 @@ button {
 }
 
 .plus-wrap, .minus-wrap {
-    background-color: grey;
     width: 30px;
     height: 30px;
     display: flex;
@@ -60,15 +59,35 @@ button {
     cursor: pointer;
 }
 
-.plus-wrap p, .minus-wrap p, .amount p {
+.plus-wrap p, .minus-wrap p {
     margin: 0;
 }
 
-.amount {
-    background-color: lightgray;
+.amount-wrap {
     height: 30px;
     width: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.amount-wrap input {
+    width: 45px;
+    padding: 0;
+    height: 30px;
+    border: 0;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    outline: none;
+    margin: 0 0 0 5px;
+}
+
+.plus-wrap, .minus-wrap, .amount-wrap {
+    border: 1px solid grey;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
