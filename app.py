@@ -1,7 +1,7 @@
 import hashlib
-
 from flask import Flask, render_template, request, Response, redirect, make_response
 import mysql.connector
+from collections import Counter
 
 app = Flask(__name__, template_folder="./views")
 
@@ -9,8 +9,22 @@ app = Flask(__name__, template_folder="./views")
 @app.route('/')
 def index():
     user_login = request.cookies.get("login")
-    response = make_response(render_template(template_name_or_list='main/index.html', login=user_login))
-    return response
+    try:
+        host = "localhost"
+        user = "root"
+        password = ""
+        database = "sklep"
+        connect = mysql.connector.connect(host=host, user=user, password=password, database=database)
+        cursor = connect.cursor()
+        cursor.execute("SELECT * FROM items")
+        items = cursor.fetchall()
+        response = make_response(
+            render_template(template_name_or_list='main/index.html', login=user_login, items=items))
+        return response
+    except:
+        return Response(
+            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
+            status=500)
 
 
 @app.route("/login")
@@ -115,6 +129,42 @@ def log_out():
     response = redirect("/login")
     response.delete_cookie("login")
     return response
+
+
+@app.route("/cart")
+def cart():
+    user_login = request.cookies.get("login")
+    cart_value = request.cookies.get("cart_value")
+    if cart_value is None:
+        cart_value = 0.0
+    cart_contents = request.cookies.get("cart_contents")
+    if cart_contents is None:
+        cart_contents = ""
+    else:
+        cart_contents = cart_contents.split("_")[:-1]
+    cart_dict = dict(Counter(cart_contents))
+    try:
+        host = "localhost"
+        user = "root"
+        password = ""
+        database = "sklep"
+        connect = mysql.connector.connect(host=host, user=user, password=password, database=database)
+        cursor = connect.cursor()
+        cursor.execute("SELECT * FROM items")
+        items = cursor.fetchall()
+        for item_id, num_occurrences in cart_dict.items():
+            str_item_id = str(item_id)
+            matching_items = [item for item in items if str(item[0]) == str_item_id]
+            for matching_item in matching_items:
+                item_list = list(matching_item)
+                item_list.append(num_occurrences)
+                items[items.index(matching_item)] = tuple(item_list)
+        resp = make_response(render_template("main/cart.html", login=user_login, cart=items, sum=cart_value))
+        return resp
+    except:
+        return Response(
+            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
+            status=500)
 
 
 def failed_login():

@@ -1,6 +1,27 @@
 {% extends 'layouts/base.html' %}
 {% block body %}
-<body>
-<h1>Witamy {{ login }}</h1>
+<body onload="count_cart()">
+<div id="main">
+    <h1>Przedmioty znajdujące się w asortymencie</h1>
+    <div id="wrapper">
+        {% if items is defined and items|length > 0 %}
+        {% for item in items %}
+        <div class="item">
+            <p class="item_name"><b>{{ item[1] }}</b></p>
+            {% if item[3] == "" %}
+            <img alt="{{ item[1] }}" class="item_img" src="{{ url_for('static', filename='placeholder.png') }}">
+            {% else %}
+            <img alt="{{ item[1] }}" class="item_img" src="{{ item[3] }}">
+            {% endif %}
+            <p class="item_price">Cena: <i>{{ item[2] }} zł</i></p>
+            <p id="add_to_cart" data="{{ item }}" onclick="add_to_cart(this)">🛒 dodaj do koszyka</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>Brak przedmiotów w sklepie</p>
+        {% endif %}
+    </div>
+</div>
+<script src="../../static/script/script.js"></script>
 </body>
 {% endblock %}

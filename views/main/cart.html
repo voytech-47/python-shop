@@ -1,0 +1,42 @@
+{% extends 'layouts/base.html' %}
+{% block body %}
+<link href="{{ url_for('static', filename='css/cart.css') }}" rel="stylesheet">
+<body onload="count_cart()">
+<div id="main">
+    <h1>Koszyk</h1>
+    <div id="wrapper">
+        {% for item in cart %}
+        {% if item|length == 5 %}
+        <div class="item">
+            <div class="top">
+                {% if item[3] == "" %}
+                <img alt="{{ item[1] }}" class="item_img" src="{{ url_for('static', filename='placeholder.png') }}">
+                {% else %}
+                <img alt="{{ item[1] }}" class="item_img" src="{{ item[3] }}">
+                {% endif %}
+                <p>{{item[1]}}</p>
+                <button class="delete">🗑️</button>
+            </div>
+            <div class="bottom">
+                <div class="amount-button">
+                    <div class="minus-wrap {{item[0]}}">
+                        <p>-</p>
+                    </div>
+                    <div class="amount">
+                        <p>{{item[4]}}</p>
+                    </div>
+                    <div class="plus-wrap {{item[0]}}">
+                        <p>+</p>
+                    </div>
+                </div>
+                <p class="price">{{item[2] * item[4]}} zł ({{item[4]}} * {{item[2]}} zł)</p>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        <p id="sum">Suma: {{sum}} zł</p>
+    </div>
+</div>
+</body>
+<script src="../../static/script/script.js"></script>
+{% endblock %}

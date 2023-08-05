@@ -1,16 +1,15 @@
 if (document.cookie.match("note") == null) {
-    document.getElementById(("note").style.display = "none")
+    document.getElementById("note").style.display = "none"
 } else {
     document.getElementById("note").style.display = "block"
 }
 
-let timer;
 
 function is_login_available(login) {
+    let timer;
     if (login === "") {
         document.getElementById("login_not_available").style.display = "none";
-        document.getElementById("login_available").style.display = "none";
-        document.getElementById("submit").classList.add("not-allowed")
+        document.getElementById("login_available").style.display = "none"
         return;
     }
 
@@ -27,7 +26,6 @@ function is_login_available(login) {
             if (login === "") {
                 document.getElementById("login_not_available").style.display = "none";
                 document.getElementById("login_available").style.display = "none";
-                document.getElementById("submit").style.backgroundColor = "grey"
                 return;
             }
             if (this.status === 200) {
@@ -69,4 +67,43 @@ function check_form() {
         return true
     }
 
+}
+
+function add_to_cart(raw) {
+    let current_cart_value = get_cookie("cart_value")
+    if (current_cart_value === "") {
+        current_cart_value = 0.0
+    } else {
+        current_cart_value = parseFloat(current_cart_value)
+    }
+    let current_cart_items = get_cookie("cart_contents")
+    let item = raw.getAttribute("data").slice(1, -1).split(", ")
+    let item_value = parseFloat(item[2])
+    let item_id = item[0]+"_"
+    current_cart_value += item_value
+    current_cart_items += item_id
+    set_cookie("cart_value", current_cart_value.toFixed(2))
+    set_cookie("cart_contents", current_cart_items)
+    count_cart()
+}
+
+function count_cart() {
+    let value = get_cookie("cart_value")
+    if (value !== "") {
+        document.getElementById("cart_value").innerHTML = value + " zł"
+    } else {
+        document.getElementById("cart_value").innerHTML = "0.00 zł"
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    count_cart()
+});
+
+function get_cookie(name) {
+    return ('; ' + document.cookie).split(`; ` + name + `=`).pop().split(';')[0];
+}
+
+function set_cookie(name, value) {
+    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; path=/`;
 }

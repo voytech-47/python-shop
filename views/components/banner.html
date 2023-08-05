@@ -1,10 +1,17 @@
 <div id="banner">
     <div id="left">
-        <p>Sklep</p>
-    </div>
-    <div id="right">
+        <a href="/">Sklep</a>
         {% if login is defined %}
         <p>Zalogowany użytkownik: <i>{{ login }}</i></p>
+    </div>
+    <div id="right">
+        <div id="cart_wrapper">
+        <a href="/cart">Koszyk</a>
+            <p id="cart_value">0.00 zł</p>
+        </div>
+        {% if login == "admin" %}
+        <a href="/admin">Zarządzaj</a>
+        {% endif %}
         <a href="/log-out">Wyloguj</a>
         {% endif %}
     </div>
