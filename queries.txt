@@ -1,4 +1,6 @@
-CREATE DATABASE sklep
+CREATE DATABASE sklep;
+
+USE sklep;
 
 CREATE TABLE `sklep`.`users` (
 	`id` INT(8) NOT NULL AUTO_INCREMENT , 
