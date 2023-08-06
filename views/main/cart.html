@@ -5,9 +5,10 @@
 <div id="main">
     <h1>Koszyk</h1>
     <div id="wrapper">
+        <p id="cart_empty">Koszyk jest pusty</p>
         {% for item in cart %}
         {% if item|length == 5 %}
-        <div class="item">
+        <div class="item {{item[0]}}">
             <div class="top">
                 {% if item[3] == "" %}
                 <img alt="{{ item[1] }}" class="item-img" src="{{ url_for('static', filename='placeholder.png') }}">
@@ -15,28 +16,33 @@
                 <img alt="{{ item[1] }}" class="item-img" src="{{ item[3] }}">
                 {% endif %}
                 <p>{{item[1]}}</p>
-                <button class="delete">🗑️</button>
+                <button class="delete {{item[0]}}" onclick="delete_item(this)">🗑️</button>
             </div>
             <div class="bottom">
                 <div class="amount-button">
-                    <div class="minus-wrap {{item[0]}}">
+                    <div class="minus-wrap {{item[0]}}" onclick="update_amount_click(this, -1)">
                         <p class="minus {{item[0]}}" onload="console.log('loaded')">-</p>
                     </div>
+                    <script type="text/javascript">
+                        if ({{item[4]}} === 1) {
+                            document.getElementsByClassName("minus-wrap {{item[0]}}")[0].classList.add("disabled")
+                        }
+                    </script>
                     <div class="amount-wrap">
-                        <input class="amount {{item[0]}}" min="1" name="amount-input"
-                               onfocusout="check_amount(this)" oninput="change_amount(this)"
-                               type="number" value="{{item[4]}}">
+                        <input class="amount {{item[0]}}" data="{{item[2]}}" min="1" name="amount-input"
+                               onfocusout="update_amount(this)"
+                               type="number" value="{{item[4]}}" old_value="{{item[4]}}">
                     </div>
-                    <div class="plus-wrap {{item[0]}}">
+                    <div class="plus-wrap {{item[0]}}" onclick="update_amount_click(this, 1)">
                         <p class="plus {{item[0]}}">+</p>
                     </div>
                 </div>
-                <p class="price">{{item[2] * item[4]}} zł ({{item[4]}} * {{item[2]}} zł)</p>
+                <p class="price {{item[0]}}">{{ "%.2f zł"|format(item[2] * item[4]) }} ({{item[4]}} * {{item[2]}} zł)</p>
             </div>
         </div>
         {% endif %}
         {% endfor %}
-        <p id="sum">Suma: {{sum}} zł</p>
+        <p id="sum" data="{{sum}}">Suma: {{sum}} zł</p>
     </div>
 </div>
 </body>

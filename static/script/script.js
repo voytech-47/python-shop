@@ -79,7 +79,7 @@ function add_to_cart(raw) {
     let current_cart_items = get_cookie("cart_contents")
     let item = raw.getAttribute("data").slice(1, -1).split(", ")
     let item_value = parseFloat(item[2])
-    let item_id = item[0]+"_"
+    let item_id = item[0] + "_"
     current_cart_value += item_value
     current_cart_items += item_id
     set_cookie("cart_value", current_cart_value.toFixed(2))
@@ -93,6 +93,9 @@ function count_cart() {
         document.getElementById("cart_value").innerHTML = value + " zł"
     } else {
         document.getElementById("cart_value").innerHTML = "0.00 zł"
+    }
+    if (get_cookie("cart_contents") !== "") {
+        document.getElementById("cart_empty").style.display = "none"
     }
 }
 
@@ -114,8 +117,82 @@ function change_amount(field) {
     }
 }
 
-function check_amount(field) {
-    if (field.value < 1) {
+function update_amount(field) {
+    let price = parseFloat(field.getAttribute("data"))
+    let amount = parseInt(field.value)
+    let old_amount = parseInt(field.getAttribute("old_value"))
+    let id = field.classList[1]
+    let cart_value = parseFloat(document.getElementById("sum").getAttribute("data"))
+    if (amount < 1 || !Number.isInteger(amount)) {
         field.value = 1
+        document.getElementsByClassName("price " + id)[0].innerHTML = price + " zł (1 * " + price + " zł)"
+        cart_value -= (old_amount * price).toFixed(2)
+        cart_value += price.toFixed(2)
+        set_cart(cart_value)
+    } else {
+        document.getElementsByClassName("price " + id)[0].innerHTML = (price * amount).toFixed(2) + " zł (" + amount + " * " + price + " zł)"
+        let substr = (old_amount * price).toFixed(2)
+        let add = (amount * price).toFixed(2)
+        cart_value -= parseFloat(substr)
+        cart_value += parseFloat(add)
+        set_cart(cart_value)
+        if (amount === 1) {
+            document.getElementsByClassName("minus-wrap " + id)[0].classList.add("disabled")
+        } else {
+            document.getElementsByClassName("minus-wrap " + id)[0].classList.remove("disabled")
+        }
     }
+    field.setAttribute("old_value", amount)
+}
+
+function update_amount_click(field, value) {
+    let id = field.classList[1]
+    let price = parseFloat(document.getElementsByClassName("amount " + id)[0].getAttribute("data"))
+    let input_value = parseInt(document.getElementsByClassName("amount " + id)[0].value)
+    if (input_value === 1 && value === -1) {
+        return
+    } else {
+        document.getElementsByClassName("minus-wrap " + id)[0].classList.remove("disabled")
+    }
+    input_value += parseInt(value)
+    document.getElementsByClassName("amount " + field.classList[1])[0].value = input_value
+    document.getElementsByClassName("amount " + field.classList[1])[0].setAttribute("old_value", input_value)
+    document.getElementsByClassName("price " + id)[0].innerHTML = (price * input_value).toFixed(2) + " zł (" + input_value + " * " + price + " zł)"
+    let cart_value = parseFloat(document.getElementById("sum").getAttribute("data"))
+    if (value > 0) {
+        cart_value += price
+    } else {
+        cart_value -= price
+    }
+    set_cookie("cart_value", cart_value.toFixed(2))
+    set_cart(cart_value)
+    if (input_value === 1) {
+        document.getElementsByClassName("minus-wrap " + id)[0].classList.add("disabled")
+    }
+}
+
+function delete_item(field) {
+    let cart_value = parseFloat(document.getElementById("sum").getAttribute("data"))
+    let id = field.classList[1]
+    let item = document.getElementsByClassName("amount " + id)[0]
+    let amount = item.value
+    let price = item.getAttribute("data")
+    let substr = (amount * price).toFixed(2)
+    cart_value -= parseFloat(substr)
+    set_cart(cart_value)
+    set_cookie("cart_value", cart_value.toFixed(2))
+    let old_items = get_cookie("cart_contents")
+    let new_items = old_items.split(id + "_").join("")
+    set_cookie("cart_contents", new_items)
+    document.getElementsByClassName("item " + id)[0].remove()
+    if (get_cookie("cart_contents") === "") {
+        document.getElementById("cart_empty").style.display = "block"
+    }
+
+}
+
+function set_cart(value) {
+    document.getElementById("sum").innerHTML = "Suma: " + value.toFixed(2) + " zł"
+    document.getElementById("sum").setAttribute("data", value.toFixed(2))
+    document.getElementById("cart_value").innerHTML = value.toFixed(2) + " zł"
 }

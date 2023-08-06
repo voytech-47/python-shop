@@ -1,6 +1,8 @@
 .item-img {
-    max-width: 90px;
+    height: 100px;
+    width: 100px;
     padding: 10px;
+    object-fit: contain;
 }
 
 #wrapper {
@@ -57,6 +59,9 @@ button {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    font-size: 30px;
+    line-height: 30px;
+    user-select: none
 }
 
 .plus-wrap p, .minus-wrap p {
@@ -90,4 +95,17 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+.disabled {
+    color: #c3c3c3;
+    cursor: not-allowed;
+}
+
+.delete {
+    cursor: pointer;
+}
+
+#cart_empty {
+    /*display: none;*/
 }
