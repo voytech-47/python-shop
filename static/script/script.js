@@ -171,7 +171,7 @@ function update_amount_click(field, value) {
     }
 }
 
-function delete_item(field) {
+function delete_item_from_cart(field) {
     let cart_value = parseFloat(document.getElementById("sum").getAttribute("data"))
     let id = field.classList[1]
     let item = document.getElementsByClassName("amount " + id)[0]
@@ -189,6 +189,26 @@ function delete_item(field) {
         document.getElementById("cart_empty").style.display = "block"
     }
 
+}
+
+
+function confirm_change(prompt) {
+    return confirm(prompt)
+}
+
+function change_price(field) {
+    if (!confirm("Czy zmienić cenę przedmiotu?")) {
+        return
+    }
+    let id = field.classList[1]
+    let value = document.getElementsByClassName("item-price " + id)[0].value
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:5000/api/change_price", true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({
+        "id": id,
+        "price": value
+    }));
 }
 
 function set_cart(value) {

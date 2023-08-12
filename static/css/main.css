@@ -65,14 +65,23 @@ footer {
     align-items: center;
     margin: 10px;
     padding: 10px;
+    width: 15%;
+}
+
+.item a {
+    color: black;
+    text-decoration: none;
+    margin-top: 1rem;
 }
 
 #wrapper {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+    margin: auto;
+    max-width: 80%;
+    flex-wrap: wrap;
 }
 
 #add_to_cart {
@@ -83,4 +92,61 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper input {
+    width: 50px;
+}
+
+.input-wrapper p {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#wrapper + a, form + a {
+    text-align: center;
+    display: block;
+    margin-top: 2rem;
+    font-size: 18px;
+    text-decoration: underline solid #5d57b2;
+    color: black;
+}
+
+input[type=text], input[type=number] {
+    width: 100%;
+    padding: 8px 16px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+form {
+    border: 3px solid #f1f1f1;
+    margin: auto;
+    max-width: 50%;
+}
+
+#container {
+    padding: 16px;
+}
+
+button {
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    background: #867dff;
 }

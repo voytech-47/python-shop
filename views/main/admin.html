@@ -1,0 +1,34 @@
+{% extends 'layouts/base.html' %}
+{% block body %}
+<body onload="count_cart()">
+<div id="main">
+    <h1>Panel administratora</h1>
+    <div id="wrapper">
+        {% if items is defined and items|length > 0 %}
+        {% for item in items %}
+        <div class="item">
+            <p class="item_name"><b>{{ item[1] }}</b></p>
+            {% if item[3] == "" %}
+            <img alt="{{ item[1] }}" class="item_img" src="{{ url_for('static', filename='placeholder.png') }}">
+            {% else %}
+            <img alt="{{ item[1] }}" class="item_img" src="{{ item[3] }}">
+            {% endif %}
+            <div class="input-wrapper">
+            <p class="item_price">Cena: </p>
+            <input class="item-price {{item[0]}}" min="1" type="number" value="{{item[2]}}">
+            <p>zł</p>
+            </div>
+            <button class="change_price {{item[0]}}" onclick="change_price(this)">Zmień cenę</button>
+            <a class="delete {{item[0]}}" href="/api/delete_item/{{item[0]}}"
+               onclick="return confirm_change('Czy usunąć przedmiot z bazy danych?')">🗑️ usuń przedmiot</a>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>Brak przedmiotów w sklepie</p>
+        {% endif %}
+    </div>
+    <a href="/admin/new_item">Dodaj przemdmiot</a>
+</div>
+<script src="../../static/script/script.js"></script>
+</body>
+{% endblock %}

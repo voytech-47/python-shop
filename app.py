@@ -6,20 +6,26 @@ from collections import Counter
 app = Flask(__name__, template_folder="./views")
 
 
+def db_connect():
+    host = "localhost"
+    user = "root"
+    password = ""
+    database = "sklep"
+    connect = mysql.connector.connect(host=host, user=user, password=password, database=database)
+    cursor = connect.cursor()
+    return connect, cursor
+
+
 @app.route('/')
-def index():
+def index(file="index.html"):
     user_login = request.cookies.get("login")
     try:
-        host = "localhost"
-        user = "root"
-        password = ""
-        database = "sklep"
-        connect = mysql.connector.connect(host=host, user=user, password=password, database=database)
-        cursor = connect.cursor()
+        connect, cursor = db_connect()
         cursor.execute("SELECT * FROM items")
         items = cursor.fetchall()
+        template_file = f'main/{file}'
         response = make_response(
-            render_template(template_name_or_list='main/index.html', login=user_login, items=items))
+            render_template(template_name_or_list=template_file, login=user_login, items=items))
         return response
     except:
         return Response(
@@ -45,12 +51,7 @@ def sign_up():
 @app.route("/api/search_login", methods=["POST"])
 def login_api():
     try:
-        host = "localhost"
-        user = "root"
-        password = ""
-        database = "sklep"
-        connect = mysql.connector.connect(host=host, user=user, password=password, database=database)
-        cursor = connect.cursor()
+        connect, cursor = db_connect()
         cursor.execute("SELECT login, password FROM users")
         users = cursor.fetchall()
         user_login = request.form.get("login")
@@ -76,24 +77,19 @@ def login_api():
 
 @app.route("/api/sign_up", methods=["POST"])
 def signup_api():
-    login = request.form.get("login")
+    user_login = request.form.get("user_login")
     password = request.form.get("password")
     hashing = hashlib.sha3_256()
     hashing.update(password.encode("utf8"))
     hashed_password = hashing.hexdigest()
     try:
-        host = "localhost"
-        user = "root"
-        password = ""
-        database = "sklep"
-        connect = mysql.connector.connect(host=host, user=user, password=password, database=database)
-        cursor = connect.cursor()
-        query = f"INSERT INTO users VALUES ('', '{login}', '{hashed_password}');"
+        connect, cursor = db_connect()
+        query = f"INSERT INTO users VALUES ('', '{user_login}', '{hashed_password}');"
         cursor.execute(query)
         connect.commit()
         connect.close()
         resp = redirect("/")
-        resp.set_cookie("login", login)
+        resp.set_cookie("user_login", user_login)
         return resp
     except:
         return Response(
@@ -104,20 +100,66 @@ def signup_api():
 @app.route("/api/is_login_available", methods=["POST"])
 def is_login_available():
     try:
-        host = "localhost"
-        user = "root"
-        password = ""
-        database = "sklep"
-        connect = mysql.connector.connect(host=host, user=user, password=password, database=database)
-        cursor = connect.cursor()
+        connect, cursor = db_connect()
         cursor.execute("SELECT login, password FROM users")
         users = cursor.fetchall()
-        logins = [login for login, _ in users]
+        logins = [user_login for user_login, _ in users]
         user_login = request.get_json()
         if user_login["login"] in logins:
             return Response(status=418)
 
         return Response(status=200)
+    except:
+        return Response(
+            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
+            status=500)
+
+
+@app.route("/api/delete_item/<int:id>")
+def delete_item(id):
+    try:
+        connect, cursor = db_connect()
+        cursor.execute(f"DELETE FROM items WHERE id = {id}")
+        connect.commit()
+        connect.close()
+        resp = redirect("/admin")
+        return resp
+    except:
+        return Response(
+            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
+            status=500)
+
+
+@app.route("/api/change_price", methods=["POST"])
+def change_price():
+    data = request.get_json()
+    id = int(data["id"])
+    price = float(data["price"])
+    try:
+        connect, cursor = db_connect()
+        cursor.execute(f"UPDATE items SET price={price} WHERE id={id}")
+        connect.commit()
+        connect.close()
+        resp = redirect("/admin")
+        return resp
+    except:
+        return Response(
+            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
+            status=500)
+
+
+@app.route("/api/add_item", methods=["POST"])
+def add_item():
+    name = request.form.get("name")
+    price = float(request.form.get("price"))
+    photo = request.form.get("photo")
+    try:
+        connect, cursor = db_connect()
+        cursor.execute(f"INSERT INTO items VALUES ('', '{name}', {price}, '{photo}');")
+        connect.commit()
+        connect.close()
+        resp = redirect("/admin")
+        return resp
     except:
         return Response(
             response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
@@ -144,12 +186,7 @@ def cart():
         cart_contents = cart_contents.split("_")[:-1]
     cart_dict = dict(Counter(cart_contents))
     try:
-        host = "localhost"
-        user = "root"
-        password = ""
-        database = "sklep"
-        connect = mysql.connector.connect(host=host, user=user, password=password, database=database)
-        cursor = connect.cursor()
+        connect, cursor = db_connect()
         cursor.execute("SELECT * FROM items")
         items = cursor.fetchall()
         for item_id, num_occurrences in cart_dict.items():
@@ -158,13 +195,26 @@ def cart():
             for matching_item in matching_items:
                 item_list = list(matching_item)
                 item_list.append(num_occurrences)
-                items[items.index(matching_item)] = tuple(item_list)
+                items[items.index()] = tuple(item_list)
         resp = make_response(render_template("main/cart.html", login=user_login, cart=items, sum=cart_value))
         return resp
     except:
         return Response(
             response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
             status=500)
+
+
+@app.route("/admin")
+def admin_panel():
+    response = index("admin.html")
+    return response
+
+
+@app.route("/admin/new_item")
+def new_item():
+    user_login = request.cookies.get("login")
+    cart_value = request.cookies.get("cart_value")
+    return render_template("main/new_item.html", login=user_login, sum=cart_value)
 
 
 def failed_login():
@@ -176,7 +226,7 @@ def failed_login():
 if __name__ == '__main__':
     app.run()
 
-# tooltip dodano do koszyka
+# tooltip dodano/usunieto do koszyka
 # usuwanie z koszyka
 # dynamiczna zmiana ilości przedmiotów
 #
