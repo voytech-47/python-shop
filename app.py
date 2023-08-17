@@ -19,6 +19,8 @@ def db_connect():
 @app.route('/')
 def index(file="index.html"):
     user_login = request.cookies.get("login")
+    if user_login is None or (user_login != "admin" and file == "admin.html"):
+        return redirect("/login")
     try:
         connect, cursor = db_connect()
         cursor.execute("SELECT * FROM items")
@@ -77,7 +79,7 @@ def login_api():
 
 @app.route("/api/sign_up", methods=["POST"])
 def signup_api():
-    user_login = request.form.get("user_login")
+    user_login = request.form.get("login")
     password = request.form.get("password")
     hashing = hashlib.sha3_256()
     hashing.update(password.encode("utf8"))
@@ -89,7 +91,7 @@ def signup_api():
         connect.commit()
         connect.close()
         resp = redirect("/")
-        resp.set_cookie("user_login", user_login)
+        resp.set_cookie("login", user_login)
         return resp
     except:
         return Response(
@@ -130,14 +132,15 @@ def delete_item(id):
             status=500)
 
 
-@app.route("/api/change_price", methods=["POST"])
-def change_price():
-    data = request.get_json()
-    id = int(data["id"])
-    price = float(data["price"])
+@app.route("/api/change_item_info", methods=["POST"])
+def change_item_info():
+    id = int(request.form.get("id"))
+    name = request.form.get("name")
+    price = float(request.form.get("price"))
+    photo = request.form.get("photo")
     try:
         connect, cursor = db_connect()
-        cursor.execute(f"UPDATE items SET price={price} WHERE id={id}")
+        cursor.execute(f"UPDATE items SET name='{name}', price={price}, image='{photo}' WHERE id={id};")
         connect.commit()
         connect.close()
         resp = redirect("/admin")

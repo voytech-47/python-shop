@@ -6,28 +6,39 @@
     <div id="wrapper">
         {% if items is defined and items|length > 0 %}
         {% for item in items %}
-        <div class="item">
-            <p class="item_name"><b>{{ item[1] }}</b></p>
+        <form action="http://localhost:5000/api/change_item_info" class="item {{item[0]}}" method="post">
+            <input id="id" name="id" style="display: none" type="number" value="{{item[0]}}">
+            <div class="input-wrapper">
+                <p class="item_name">Nazwa:</p>
+                <input class="item-name {{item[0]}}" name="name" type="text" value="{{item[1]}}">
+            </div>
             {% if item[3] == "" %}
             <img alt="{{ item[1] }}" class="item_img" src="{{ url_for('static', filename='placeholder.png') }}">
             {% else %}
             <img alt="{{ item[1] }}" class="item_img" src="{{ item[3] }}">
             {% endif %}
             <div class="input-wrapper">
-            <p class="item_price">Cena: </p>
-            <input class="item-price {{item[0]}}" min="1" type="number" value="{{item[2]}}">
-            <p>zł</p>
+                <p class="item_photo">Zdjęcie:</p>
+                <input class="item-photo {{item[0]}}" name="photo" type="text" value="{{item[3]}}">
             </div>
-            <button class="change_price {{item[0]}}" onclick="change_price(this)">Zmień cenę</button>
+            <div class="input-wrapper">
+                <p class="item_price">Cena: </p>
+                <input class="item-price {{item[0]}}" min="1" name="price" step="0.01" type="number"
+                       value="{{item[2]}}">
+                <p>zł</p>
+            </div>
+            <button class="change_price {{item[0]}}"
+                    onclick="return confirm_change('Czy zaktualizować informacje o przedmiocie?')">Zaktualizuj
+            </button>
             <a class="delete {{item[0]}}" href="/api/delete_item/{{item[0]}}"
                onclick="return confirm_change('Czy usunąć przedmiot z bazy danych?')">🗑️ usuń przedmiot</a>
-        </div>
+        </form>
         {% endfor %}
         {% else %}
         <p>Brak przedmiotów w sklepie</p>
         {% endif %}
     </div>
-    <a href="/admin/new_item">Dodaj przemdmiot</a>
+    <a id="add" href="/admin/new_item">Dodaj przemdmiot</a>
 </div>
 <script src="../../static/script/script.js"></script>
 </body>

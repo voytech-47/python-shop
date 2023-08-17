@@ -65,7 +65,8 @@ footer {
     align-items: center;
     margin: 10px;
     padding: 10px;
-    width: 15%;
+    width: 20%;
+    min-width: 200px;
 }
 
 .item a {
@@ -121,6 +122,10 @@ input::-webkit-inner-spin-button {
     font-size: 18px;
     text-decoration: underline solid #5d57b2;
     color: black;
+}
+
+#add {
+    margin-bottom: 1rem;
 }
 
 input[type=text], input[type=number] {

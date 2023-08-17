@@ -196,21 +196,6 @@ function confirm_change(prompt) {
     return confirm(prompt)
 }
 
-function change_price(field) {
-    if (!confirm("Czy zmienić cenę przedmiotu?")) {
-        return
-    }
-    let id = field.classList[1]
-    let value = document.getElementsByClassName("item-price " + id)[0].value
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:5000/api/change_price", true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify({
-        "id": id,
-        "price": value
-    }));
-}
-
 function set_cart(value) {
     document.getElementById("sum").innerHTML = "Suma: " + value.toFixed(2) + " zł"
     document.getElementById("sum").setAttribute("data", value.toFixed(2))
