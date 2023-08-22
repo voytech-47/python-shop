@@ -14,7 +14,12 @@
             <img alt="{{ item[1] }}" class="item_img" src="{{ item[3] }}">
             {% endif %}
             <p class="item_price">Cena: <i>{{ item[2] }} zł</i></p>
-            <p id="add_to_cart" data="{{ item }}" onclick="add_to_cart(this)">🛒 dodaj do koszyka</p>
+            <div class="item-wrapper {{item[0]}}">
+                <p data="{{ item }}" id="add_to_cart" onclick="add_to_cart(this)">🛒 dodaj do koszyka</p>
+                <div class="tooltip {{item[0]}}">
+                    <p>Dodano do koszyka</p>
+                </div>
+            </div>
         </div>
         {% endfor %}
         {% else %}

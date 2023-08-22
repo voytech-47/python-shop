@@ -1,7 +1,9 @@
-if (document.cookie.match("note") == null) {
-    document.getElementById("note").style.display = "none"
-} else {
-    document.getElementById("note").style.display = "block"
+if (window.location.href.split("/").slice(-1).toString() === "login") {
+    if (document.cookie.match("note") == null && document.getElementById("note") != null) {
+        document.getElementById("note").style.display = "none"
+    } else {
+        document.getElementById("note").style.display = "block"
+    }
 }
 
 
@@ -84,6 +86,11 @@ function add_to_cart(raw) {
     current_cart_items += item_id
     set_cookie("cart_value", current_cart_value.toFixed(2))
     set_cookie("cart_contents", current_cart_items)
+    let tooltip = document.getElementsByClassName("tooltip " + item[0])[0]
+    tooltip.classList.add("active");
+    setTimeout(() => {
+        tooltip.classList.remove("active");
+    }, 2000);
     count_cart()
 }
 
@@ -94,7 +101,7 @@ function count_cart() {
     } else {
         document.getElementById("cart_value").innerHTML = "0.00 zł"
     }
-    if (get_cookie("cart_contents") !== "") {
+    if (get_cookie("cart_contents") !== "" && window.location.href.split("/").slice(-1).toString() === "cart") {
         document.getElementById("cart_empty").style.display = "none"
     }
 }

@@ -198,10 +198,11 @@ def cart():
             for matching_item in matching_items:
                 item_list = list(matching_item)
                 item_list.append(num_occurrences)
-                items[items.index()] = tuple(item_list)
+                items[items.index(matching_item)] = tuple(item_list)
         resp = make_response(render_template("main/cart.html", login=user_login, cart=items, sum=cart_value))
         return resp
-    except:
+    except Exception as err:
+        print(err)
         return Response(
             response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
             status=500)

@@ -155,3 +155,33 @@ button {
     width: 100%;
     background: #867dff;
 }
+
+.tooltip {
+    border: 2px solid grey;
+    border-radius: 10px;
+    padding: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #c3beff;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.tooltip.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+.tooltip p {
+    margin: 0;
+}
+
+.item-wrapper {
+    text-align: center;
+    position: relative;
+}
+
