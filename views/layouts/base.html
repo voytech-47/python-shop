@@ -11,5 +11,9 @@
     {% include 'components/banner.html' %}
     {% block body %}{% endblock %}
     {% include 'components/footer.html' %}
+<script src="../../static/script/script.js"></script>
+<script>
+    let session = {{session|tojson}}
+</script>
 </body>
 </html>
