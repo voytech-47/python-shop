@@ -1,12 +1,3 @@
-if (window.location.href.split("/").slice(-1).toString() === "login") {
-    if (document.cookie.match("note") == null && document.getElementById("note") != null) {
-        document.getElementById("note").style.display = "none"
-    } else {
-        document.getElementById("note").style.display = "block"
-    }
-}
-
-
 function is_login_available(login) {
     let timer;
     if (login === "") {
@@ -94,21 +85,21 @@ function add_to_cart(raw) {
     count_cart()
 }
 
-function count_cart() {
-    let value = get_cookie("cart_value")
-    if (value !== "") {
-        document.getElementById("cart_value").innerHTML = value + " zł"
-    } else {
-        document.getElementById("cart_value").innerHTML = "0.00 zł"
-    }
-    if (get_cookie("cart_contents") !== "" && window.location.href.split("/").slice(-1).toString() === "cart") {
-        document.getElementById("cart_empty").style.display = "none"
-    }
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    count_cart()
-});
+// function count_cart() {
+//     let value = get_cookie("cart_value")
+//     if (value !== "") {
+//         document.getElementById("cart_value").innerHTML = value + " zł"
+//     } else {
+//         document.getElementById("cart_value").innerHTML = "0.00 zł"
+//     }
+//     if (get_cookie("cart_contents") !== "" && window.location.href.split("/").slice(-1).toString() === "cart") {
+//         document.getElementById("cart_empty").style.display = "none"
+//     }
+// }
+//
+// document.addEventListener("DOMContentLoaded", function () {
+//     count_cart()
+// });
 
 function get_cookie(name) {
     return ('; ' + document.cookie).split(`; ` + name + `=`).pop().split(';')[0];

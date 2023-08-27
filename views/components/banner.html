@@ -7,7 +7,7 @@
     <div id="right">
         <div id="cart_wrapper">
         <a href="/cart">Koszyk</a>
-            <p id="cart_value">{{session["cart"]["value"]|float}} zł</p>
+            <p id="cart_value">{{'%0.2f' % session["cart"]["value"]|float}} zł</p>
         </div>
         {% if login == "admin" %}
         <a href="/admin">Zarządzaj</a>

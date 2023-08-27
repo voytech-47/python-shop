@@ -7,7 +7,6 @@ from collections import Counter
 
 app = Flask(__name__, template_folder="./views")
 app.secret_key = secrets.token_hex()
-app.debug = True
 
 
 def db_connect():
@@ -175,9 +174,6 @@ def add_item():
 
 @app.route("/log-out")
 def log_out():
-    response = redirect("/login")
-    response.delete_cookie("login")
-    return response
     user_login = session["login"]
     try:
         connect, cursor = db_connect()
@@ -191,6 +187,24 @@ def log_out():
     session.clear()
     return redirect("/login")
 
+
+@app.route("/api/add_to_cart/<int:id>")
+def add_to_cart(id):
+    if str(id) in session["cart"]["contents"]:
+        session["cart"]["contents"][str(id)] += 1
+    else:
+        session["cart"]["contents"][str(id)] = 1
+    session["cart"]["quantity"] += 1
+    try:
+        connect, cursor = db_connect()
+        cursor.execute(f"SELECT price FROM items WHERE id = {str(id)}")
+        price = cursor.fetchall()
+        session["cart"]["value"] += price[0][0]
+        session.modified = True
+        return redirect("/")
+    except Exception as e:
+        print(e)
+        return Response(status=500)
 
 
 @app.route("/show")
