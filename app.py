@@ -1,9 +1,13 @@
 import hashlib
-from flask import Flask, render_template, request, Response, redirect, make_response
+import secrets
+
+from flask import Flask, render_template, request, Response, redirect, make_response, session
 import mysql.connector
 from collections import Counter
 
 app = Flask(__name__, template_folder="./views")
+app.secret_key = secrets.token_hex()
+app.debug = True
 
 
 def db_connect():
@@ -29,10 +33,9 @@ def index(file="index.html"):
         response = make_response(
             render_template(template_name_or_list=template_file, login=user_login, items=items))
         return response
-    except:
-        return Response(
-            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
-            status=500)
+    except Exception as e:
+        print(e)
+        return Response(status=500)
 
 
 @app.route("/login")
@@ -75,6 +78,9 @@ def login_api():
         return Response(
             response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
             status=500)
+    except Exception as e:
+        print(e)
+        return Response(status=500)
 
 
 @app.route("/api/sign_up", methods=["POST"])
@@ -111,10 +117,9 @@ def is_login_available():
             return Response(status=418)
 
         return Response(status=200)
-    except:
-        return Response(
-            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
-            status=500)
+    except Exception as e:
+        print(e)
+        return Response(status=500)
 
 
 @app.route("/api/delete_item/<int:id>")
@@ -126,10 +131,9 @@ def delete_item(id):
         connect.close()
         resp = redirect("/admin")
         return resp
-    except:
-        return Response(
-            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
-            status=500)
+    except Exception as e:
+        print(e)
+        return Response(status=500)
 
 
 @app.route("/api/change_item_info", methods=["POST"])
@@ -145,10 +149,9 @@ def change_item_info():
         connect.close()
         resp = redirect("/admin")
         return resp
-    except:
-        return Response(
-            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
-            status=500)
+    except Exception as e:
+        print(e)
+        return Response(status=500)
 
 
 @app.route("/api/add_item", methods=["POST"])
@@ -163,10 +166,9 @@ def add_item():
         connect.close()
         resp = redirect("/admin")
         return resp
-    except:
-        return Response(
-            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
-            status=500)
+    except Exception as e:
+        print(e)
+        return Response(status=500)
 
 
 @app.route("/log-out")
