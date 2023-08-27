@@ -22,14 +22,20 @@ def db_connect():
 
 @app.route('/')
 def index(file="index.html"):
-    user_login = request.cookies.get("login")
-    if user_login is None or (user_login != "admin" and file == "admin.html"):
+    if "login" not in session or (session["login"] != "admin" and file == "admin.html"):
         return redirect("/login")
+    user_login = session["login"]
     try:
         connect, cursor = db_connect()
         cursor.execute("SELECT * FROM items")
         items = cursor.fetchall()
         template_file = f'main/{file}'
+        if "cart" not in session:
+            session["cart"] = {
+                "value": 0,
+                "quantity": 0,
+                "contents": {}
+            }
         response = make_response(
             render_template(template_name_or_list=template_file, login=user_login, items=items))
         return response
@@ -42,7 +48,7 @@ def index(file="index.html"):
 def login():
     note = ""
     try:
-        note = request.cookies.get("note")
+        note = session["note"]
     except:
         pass
     return render_template("main/login.html", note=note)
@@ -70,14 +76,11 @@ def login_api():
         hashed_user_password = hashing.hexdigest()
         if hashed_user_password != search_result[1]:
             return failed_login()
-        response = redirect("/")
-        response.set_cookie("login", user_login)
-        response.set_cookie("note", "", expires=0)
-        return response
-    except:
-        return Response(
-            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
-            status=500)
+
+        session["login"] = user_login
+        session["note"] = ""
+        session.modified = True
+        return redirect("/")
     except Exception as e:
         print(e)
         return Response(status=500)
@@ -96,13 +99,12 @@ def signup_api():
         cursor.execute(query)
         connect.commit()
         connect.close()
-        resp = redirect("/")
-        resp.set_cookie("login", user_login)
-        return resp
-    except:
-        return Response(
-            response=f"Cannot connect to database is server running? are the credentials correct? is database created?",
-            status=500)
+        session["login"] = user_login
+        session.modified = True
+        return redirect("/")
+    except Exception as e:
+        print(e)
+        return Response(status=500)
 
 
 @app.route("/api/is_login_available", methods=["POST"])
@@ -176,32 +178,43 @@ def log_out():
     response = redirect("/login")
     response.delete_cookie("login")
     return response
+    user_login = session["login"]
+    try:
+        connect, cursor = db_connect()
+        for key, value in session["cart"]["contents"].items():
+            cursor.execute(f"INSERT INTO carts VALUES ('', {key}, {value}, '{user_login}')")
+            connect.commit()
+        connect.close()
+    except Exception as e:
+        print(e)
+        return Response(status=500)
+    session.clear()
+    return redirect("/login")
+
+
+
+@app.route("/show")
+def show_cart():
+    print(session)
+    return redirect("/")
 
 
 @app.route("/cart")
 def cart():
-    user_login = request.cookies.get("login")
-    cart_value = request.cookies.get("cart_value")
-    if cart_value is None:
-        cart_value = 0.0
-    cart_contents = request.cookies.get("cart_contents")
-    if cart_contents is None:
-        cart_contents = ""
-    else:
-        cart_contents = cart_contents.split("_")[:-1]
-    cart_dict = dict(Counter(cart_contents))
+    user_login = session["login"]
+    cart_info = session["cart"]
     try:
         connect, cursor = db_connect()
         cursor.execute("SELECT * FROM items")
         items = cursor.fetchall()
-        for item_id, num_occurrences in cart_dict.items():
+        for item_id, num_occurrences in cart_info["contents"].items():
             str_item_id = str(item_id)
             matching_items = [item for item in items if str(item[0]) == str_item_id]
             for matching_item in matching_items:
                 item_list = list(matching_item)
                 item_list.append(num_occurrences)
                 items[items.index(matching_item)] = tuple(item_list)
-        resp = make_response(render_template("main/cart.html", login=user_login, cart=items, sum=cart_value))
+        resp = make_response(render_template("main/cart.html", login=user_login, cart=items, sum=cart_info["value"]))
         return resp
     except Exception as err:
         print(err)
@@ -218,15 +231,14 @@ def admin_panel():
 
 @app.route("/admin/new_item")
 def new_item():
-    user_login = request.cookies.get("login")
-    cart_value = request.cookies.get("cart_value")
+    user_login = session["login"]
+    cart_value = session["cart"]["value"]
     return render_template("main/new_item.html", login=user_login, sum=cart_value)
 
 
 def failed_login():
-    response = redirect("/login")
-    response.set_cookie("note", "Login lub hasło są niepoprawne")
-    return response
+    session["note"] = "Login lub hasło są niepoprawne"
+    return redirect("/login")
 
 
 if __name__ == '__main__':
