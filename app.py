@@ -1,9 +1,8 @@
 import hashlib
 import secrets
 
-from flask import Flask, render_template, request, Response, redirect, make_response, session
+from flask import Flask, render_template, request, Response, redirect, make_response, session, url_for
 import mysql.connector
-from collections import Counter
 
 app = Flask(__name__, template_folder="./views")
 app.secret_key = secrets.token_hex()
@@ -21,6 +20,9 @@ def db_connect():
 
 @app.route('/')
 def index(file="index.html"):
+    last_changed = request.args.get("last_changed")
+    if last_changed is not None:
+        last_changed = int(last_changed)
     if "login" not in session or (session["login"] != "admin" and file == "admin.html"):
         return redirect("/login")
     user_login = session["login"]
@@ -36,7 +38,8 @@ def index(file="index.html"):
                 "contents": {}
             }
         response = make_response(
-            render_template(template_name_or_list=template_file, login=user_login, items=items))
+            render_template(template_name_or_list=template_file, login=user_login, items=items,
+                            last_changed=last_changed))
         return response
     except Exception as e:
         print(e)
@@ -201,10 +204,27 @@ def add_to_cart(id):
         price = cursor.fetchall()
         session["cart"]["value"] += price[0][0]
         session.modified = True
-        return redirect("/")
+        return redirect(url_for("index", last_changed=id))
     except Exception as e:
         print(e)
         return Response(status=500)
+
+
+@app.route('/api/delete_from_cart/<int:id>')
+def delete_from_cart(id):
+    amount = session["cart"]["contents"][str(id)]
+    session["cart"]["contents"].pop(str(id))
+    session["cart"]["quantity"] -= amount
+    try:
+        connect, cursor = db_connect()
+        cursor.execute(f"SELECT price FROM items WHERE id = {str(id)}")
+        price = cursor.fetchall()[0][0]
+        session["cart"]["value"] -= amount * price
+    except Exception as e:
+        print(e)
+        return Response(status=500)
+    session.modified = True
+    return redirect("/cart")
 
 
 @app.route("/show")
@@ -257,8 +277,3 @@ def failed_login():
 
 if __name__ == '__main__':
     app.run()
-
-# tooltip dodano/usunieto do koszyka
-# usuwanie z koszyka
-# dynamiczna zmiana ilości przedmiotów
-#

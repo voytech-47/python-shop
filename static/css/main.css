@@ -2,6 +2,10 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+body .preload * {
+    transition: none !important;
+}
+
 h1 {
     color: #5d57b2;
     text-align: center;
@@ -166,11 +170,11 @@ button {
     background: #c3beff;
     opacity: 0;
     transform: translateY(-10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
     pointer-events: none;
 }
 
 .tooltip.active {
+    transition: opacity 0.3s ease, transform 0.3s ease;
     opacity: 1;
     transform: translateY(0);
 }

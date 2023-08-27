@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% block body %}
 <body onload="count_cart()">
-<div id="main">
+<div id="main" class="preload">
     <h1>Przedmioty znajdujące się w asortymencie</h1>
     <div id="wrapper">
         {% if items is defined and items|length > 0 %}
@@ -13,7 +13,7 @@
             {% else %}
             <img alt="{{ item[1] }}" class="item_img" src="{{ item[3] }}">
             {% endif %}
-            <p class="item_price">Cena: <i>{{ item[2] }} zł</i></p>
+            <p class="item_price">Cena: <i>{{ "%.2f zł"|format(item[2]) }}</i></p>
             <div class="item-wrapper {{item[0]}}">
                 <a href="/api/add_to_cart/{{item[0]}}" id="add_to_cart">🛒 dodaj do koszyka</a>
                 <div class="tooltip {{item[0]}}">

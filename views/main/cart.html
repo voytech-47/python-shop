@@ -16,7 +16,7 @@
                 <img alt="{{ item[1] }}" class="item-img" src="{{ item[3] }}">
                 {% endif %}
                 <p>{{item[1]}}</p>
-                <button class="delete {{item[0]}}" onclick="delete_item_from_cart(this)">🗑️</button>
+                <a href="/api/delete_from_cart/{{item[0]}}" class="delete {{item[0]}}">🗑️</a>
             </div>
             <div class="bottom">
                 <div class="amount-button">
@@ -42,7 +42,7 @@
         </div>
         {% endif %}
         {% endfor %}
-        <p id="sum" data="{{sum}}">Suma: {{sum}} zł</p>
+        <p id="sum" data="{{sum}}">Suma: {{"%.2f zł"|format(sum)}}</p>
     </div>
 </div>
 </body>

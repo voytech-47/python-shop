@@ -82,24 +82,23 @@ function add_to_cart(raw) {
     setTimeout(() => {
         tooltip.classList.remove("active");
     }, 2000);
-    count_cart()
 }
 
-// function count_cart() {
-//     let value = get_cookie("cart_value")
-//     if (value !== "") {
-//         document.getElementById("cart_value").innerHTML = value + " zł"
-//     } else {
-//         document.getElementById("cart_value").innerHTML = "0.00 zł"
-//     }
-//     if (get_cookie("cart_contents") !== "" && window.location.href.split("/").slice(-1).toString() === "cart") {
-//         document.getElementById("cart_empty").style.display = "none"
-//     }
-// }
-//
-// document.addEventListener("DOMContentLoaded", function () {
-//     count_cart()
-// });
+function chech_if_changed() {
+    var url = new URL(window.location.href);
+    let last_changed = url.searchParams.get("last_changed")
+    let tooltip = document.getElementsByClassName("tooltip " + last_changed)[0]
+    tooltip.classList.add("active")
+    setTimeout(() => {
+        document.getElementsByClassName("active")[0].classList.remove("active");
+    }, 2000);
+
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.body.classList.remove("preload")
+    chech_if_changed()
+});
 
 function get_cookie(name) {
     return ('; ' + document.cookie).split(`; ` + name + `=`).pop().split(';')[0];
@@ -202,4 +201,5 @@ function set_cart(value) {
 
 function show_ses() {
     console.log(session)
+    console.log(session["cart"])
 }
