@@ -208,3 +208,7 @@ function set_cart(value) {
     document.getElementById("sum").setAttribute("data", value.toFixed(2))
     document.getElementById("cart_value").innerHTML = value.toFixed(2) + " zł"
 }
+
+function show_ses() {
+    console.log(session)
+}

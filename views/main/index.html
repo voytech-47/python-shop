@@ -15,7 +15,7 @@
             {% endif %}
             <p class="item_price">Cena: <i>{{ item[2] }} zł</i></p>
             <div class="item-wrapper {{item[0]}}">
-                <p data="{{ item }}" id="add_to_cart" onclick="add_to_cart(this)">🛒 dodaj do koszyka</p>
+                <a href="/api/add_to_cart/{{item[0]}}" id="add_to_cart">🛒 dodaj do koszyka</a>
                 <div class="tooltip {{item[0]}}">
                     <p>Dodano do koszyka</p>
                 </div>
