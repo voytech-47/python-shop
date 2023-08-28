@@ -1,8 +1,22 @@
 import hashlib
 
-from flask import session, Response
+import mysql.connector
+from flask import session, Response, redirect
 
-from app import db_connect, failed_login
+
+def db_connect():
+    host = "localhost"
+    user = "root"
+    password = ""
+    database = "sklep"
+    connect = mysql.connector.connect(host=host, user=user, password=password, database=database)
+    cursor = connect.cursor()
+    return connect, cursor
+
+
+def failed_login():
+    session["note"] = "Login lub hasło są niepoprawne"
+    return redirect("/login")
 
 
 def save_cart_to_db(login):
@@ -91,7 +105,7 @@ def log_in(user_login, user_password):
         return Response(status=500)
 
 
-def sign_up(user_login, user_password):
+def insert_user_into_db(user_login, user_password):
     try:
         connect, cursor = db_connect()
         query = f"INSERT INTO users VALUES ('', '{user_login}', '{user_password}');"

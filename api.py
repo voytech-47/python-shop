@@ -1,9 +1,8 @@
 import hashlib
-
-from flask import session, redirect, Response, request, url_for
-
-from app import app
-from model import log_in, sign_up, get_users, delete_item_by_id, update_item_info, add_item_to_db, get_price_by_id
+from main_app import app
+from flask import url_for, request, session, redirect, Response
+from model import log_in, insert_user_into_db, get_users, delete_item_by_id, update_item_info, add_item_to_db, \
+    get_price_by_id
 
 
 @app.route("/api/search_login", methods=["POST"])
@@ -22,7 +21,7 @@ def signup_api():
     hashing = hashlib.sha3_256()
     hashing.update(password.encode("utf8"))
     hashed_password = hashing.hexdigest()
-    sign_up(user_login, hashed_password)
+    insert_user_into_db(user_login, hashed_password)
     session.modified = True
     return redirect("/")
 

@@ -1,22 +1,9 @@
 import secrets
-
-import mysql.connector
-from flask import Flask, render_template, request, redirect, make_response
-
-from model import *
+from flask import Flask, render_template, request, redirect, make_response, session
+import model
 
 app = Flask(__name__, template_folder="./views")
 app.secret_key = secrets.token_hex()
-
-
-def db_connect():
-    host = "localhost"
-    user = "root"
-    password = ""
-    database = "sklep"
-    connect = mysql.connector.connect(host=host, user=user, password=password, database=database)
-    cursor = connect.cursor()
-    return connect, cursor
 
 
 @app.route('/')
@@ -27,7 +14,7 @@ def index(file="index.html"):
     if "login" not in session or (session["login"] != "admin" and file == "admin.html"):
         return redirect("/login")
     user_login = session["login"]
-    items = get_all_items()
+    items = model.get_all_items()
     template_file = f'main/{file}'
     response = make_response(
         render_template(template_name_or_list=template_file, login=user_login, items=items,
@@ -35,6 +22,7 @@ def index(file="index.html"):
     return response
 
 
+@app.route('/api/sign_up', methods=["POST"])
 @app.route("/login")
 def login():
     note = ""
@@ -53,7 +41,7 @@ def sign_up():
 @app.route("/log_out")
 def log_out():
     user_login = session["login"]
-    save_cart_to_db(user_login)
+    model.save_cart_to_db(user_login)
     session.clear()
     return redirect("/login")
 
@@ -62,7 +50,7 @@ def log_out():
 def cart():
     user_login = session["login"]
     cart_info = session["cart"]
-    cart_contents = get_items_for_cart(cart_info)
+    cart_contents = model.get_items_for_cart(cart_info)
     resp = make_response(
         render_template("main/cart.html", login=user_login, cart=cart_contents, sum=cart_info["value"]))
     return resp
@@ -80,11 +68,6 @@ def new_item():
     cart_value = session["cart"]["value"]
     return render_template("main/new_item.html", login=user_login, sum=cart_value)
 
-
-def failed_login():
-    session["note"] = "Login lub hasło są niepoprawne"
-    return redirect("/login")
-
-
-if __name__ == '__main__':
-    app.run()
+#
+# if __name__ == '__main__':
+#     app.run()
