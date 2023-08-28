@@ -1,4 +1,4 @@
-1. Pobrać Python 3.11 z Microsoft Store
+1. Pobrać Python 3.11 z https://www.python.org/ftp/python/3.11.5/python-3.11.5-amd64.exe (Windows, 64-bit)
 2. Uruchomić terminal (najlepiej Powershell)
 3. py -m ensurepip --upgrade
 4. pip -r requirements.txt (musisz być w odpowiedniej ścieżce albo podać ścieżkę absolutną pliku requirements)
