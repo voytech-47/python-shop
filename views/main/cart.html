@@ -5,7 +5,7 @@
 <div id="main">
     <h1>Koszyk</h1>
     <div id="wrapper">
-        <p id="cart_empty">Koszyk jest pusty</p>
+        <p style="display:none;" {{'class=cart_empty' if session["cart"]["quantity"] == 0}}>Koszyk jest pusty</p>
         {% for item in cart %}
         {% if item|length == 5 %}
         <div class="item {{item[0]}}">
@@ -20,21 +20,16 @@
             </div>
             <div class="bottom">
                 <div class="amount-button">
-                    <div class="minus-wrap {{item[0]}}" onclick="update_amount_click(this, -1)">
-                        <p class="minus {{item[0]}}" onload="console.log('loaded')">-</p>
+                    <div class="minus-wrap {{item[0]}}">
+                        <a class="minus {{item[0]}} {{'disabled' if item[4] == 1}}" {{ "href=api/remove_amount/" ~ item[0] if item[4] > 1 }} >-</a>
                     </div>
-                    <script type="text/javascript">
-                        if ({{item[4]}} === 1) {
-                            document.getElementsByClassName("minus-wrap {{item[0]}}")[0].classList.add("disabled")
-                        }
-                    </script>
                     <div class="amount-wrap">
                         <input class="amount {{item[0]}}" data="{{item[2]}}" min="1" name="amount-input"
                                onfocusout="update_amount(this)"
                                type="number" value="{{item[4]}}" old_value="{{item[4]}}">
                     </div>
-                    <div class="plus-wrap {{item[0]}}" onclick="update_amount_click(this, 1)">
-                        <p class="plus {{item[0]}}">+</p>
+                    <div class="plus-wrap {{item[0]}}">
+                        <a class="plus {{item[0]}}" href="/api/add_amount/{{item[0]}}">+</a>
                     </div>
                 </div>
                 <p class="price {{item[0]}}">{{ "%.2f zł"|format(item[2] * item[4]) }} ({{item[4]}} * {{item[2]}} zł)</p>

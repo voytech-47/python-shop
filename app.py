@@ -227,6 +227,57 @@ def delete_from_cart(id):
     return redirect("/cart")
 
 
+@app.route('/api/add_amount/<int:id>')
+def add_amount(id):
+    session["cart"]["contents"][str(id)] += 1
+    session["cart"]["quantity"] += 1
+    try:
+        connect, cursor = db_connect()
+        cursor.execute(f"SELECT price FROM items WHERE id = {str(id)}")
+        price = cursor.fetchall()[0][0]
+        session["cart"]["value"] += price
+    except Exception as e:
+        print(e)
+        return Response(status=500)
+    session.modified = True
+    return redirect("/cart")
+
+
+@app.route('/api/remove_amount/<int:id>')
+def remove_amount(id):
+    session["cart"]["contents"][str(id)] -= 1
+    session["cart"]["quantity"] -= 1
+    try:
+        connect, cursor = db_connect()
+        cursor.execute(f"SELECT price FROM items WHERE id = {str(id)}")
+        price = cursor.fetchall()[0][0]
+        session["cart"]["value"] -= price
+    except Exception as e:
+        print(e)
+        return Response(status=500)
+    session.modified = True
+    return redirect("/cart")
+
+
+@app.route("/api/change_amount/<int:id>/<int:amount>")
+def change_amount(id, amount):
+    old_amount = session["cart"]["contents"][str(id)]
+    session["cart"]["contents"][str(id)] = amount
+    session["cart"]["quantity"] -= old_amount
+    session["cart"]["quantity"] += amount
+    try:
+        connect, cursor = db_connect()
+        cursor.execute(f"SELECT price FROM items WHERE id = {str(id)}")
+        price = cursor.fetchall()[0][0]
+        session["cart"]["value"] -= old_amount * price
+        session["cart"]["value"] += amount * price
+    except Exception as e:
+        print(e)
+        return Response(status=500)
+    session.modified = True
+    return redirect("/cart")
+
+
 @app.route("/show")
 def show_cart():
     print(session)

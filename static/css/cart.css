@@ -98,7 +98,7 @@ input::-webkit-inner-spin-button {
 }
 
 .disabled {
-    color: #c3c3c3;
+    color: #c3c3c3 !important;
     cursor: not-allowed;
 }
 
@@ -107,6 +107,6 @@ input::-webkit-inner-spin-button {
     width: auto;
 }
 
-#cart_empty {
-    /*display: none;*/
+.cart_empty {
+    display: block !important;
 }
