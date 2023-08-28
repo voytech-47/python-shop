@@ -115,32 +115,41 @@ function change_amount(field) {
 }
 
 function update_amount(field) {
-    let price = parseFloat(field.getAttribute("data"))
-    let amount = parseInt(field.value)
-    let old_amount = parseInt(field.getAttribute("old_value"))
-    let id = field.classList[1]
-    let cart_value = parseFloat(document.getElementById("sum").getAttribute("data"))
-    if (amount < 1 || !Number.isInteger(amount)) {
-        field.value = 1
-        document.getElementsByClassName("price " + id)[0].innerHTML = price + " zł (1 * " + price + " zł)"
-        cart_value -= (old_amount * price).toFixed(2)
-        cart_value += price.toFixed(2)
-        set_cart(cart_value)
-    } else {
-        document.getElementsByClassName("price " + id)[0].innerHTML = (price * amount).toFixed(2) + " zł (" + amount + " * " + price + " zł)"
-        let substr = (old_amount * price).toFixed(2)
-        let add = (amount * price).toFixed(2)
-        cart_value -= parseFloat(substr)
-        cart_value += parseFloat(add)
-        set_cart(cart_value)
-        if (amount === 1) {
-            document.getElementsByClassName("minus-wrap " + id)[0].classList.add("disabled")
-        } else {
-            document.getElementsByClassName("minus-wrap " + id)[0].classList.remove("disabled")
-        }
+    let amount = parseInt(field.value);
+
+    if (amount <= 0) {
+        field.value = 1;
+        update_amount_on_server(field);
+        return;
     }
-    field.setAttribute("old_value", amount)
+
+    let id = field.classList[1];
+    update_amount_on_server(field, id, amount);
 }
+
+function update_amount_on_server(field, id, amount) {
+    const url = `/api/change_amount/${id}/${amount}`;
+
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    })
+    .then(data => {
+        console.log("Response data:", data);
+        location.reload();
+    })
+    .catch(error => {
+        console.error("Fetch error:", error);
+    });
+}
+
 
 function update_amount_click(field, value) {
     let id = field.classList[1]
