@@ -31,12 +31,6 @@ def index(file="index.html"):
         cursor.execute("SELECT * FROM items")
         items = cursor.fetchall()
         template_file = f'main/{file}'
-        if "cart" not in session:
-            session["cart"] = {
-                "value": 0,
-                "quantity": 0,
-                "contents": {}
-            }
         response = make_response(
             render_template(template_name_or_list=template_file, login=user_login, items=items,
                             last_changed=last_changed))
@@ -65,22 +59,42 @@ def sign_up():
 def login_api():
     try:
         connect, cursor = db_connect()
-        cursor.execute("SELECT login, password FROM users")
+        cursor.execute("SELECT * FROM users")
         users = cursor.fetchall()
         user_login = request.form.get("login")
         user_password = request.form.get("password")
-        search_user = filter(lambda x: x[0] == user_login, users)
+        search_user = filter(lambda x: x[1] == user_login, users)
         search_result = next(search_user, None)
         if search_result is None:
             return failed_login()
         hashing = hashlib.sha3_256()
         hashing.update(user_password.encode("utf8"))
         hashed_user_password = hashing.hexdigest()
-        if hashed_user_password != search_result[1]:
+        if hashed_user_password != search_result[2]:
             return failed_login()
 
         session["login"] = user_login
         session["note"] = ""
+        user_id = search_result[0]
+        cursor.execute(f"SELECT item_id, quantity FROM carts WHERE user_id = {user_id}")
+        session["cart"] = {
+            "value": 0,
+            "quantity": 0,
+            "contents": {}
+        }
+        cart_value = 0
+        for item in cursor.fetchall():
+            session["cart"]["contents"][str(item[0])] = item[1]
+            session["cart"]["quantity"] += item[1]
+            temp_cursor = connect.cursor()
+            temp_cursor.execute(f"SELECT price FROM items WHERE id = {item[0]}")
+            price = temp_cursor.fetchall()[0][0]
+            temp_cursor.close()
+            cart_value += price * item[1]
+        session["cart"]["value"] = cart_value
+        cursor.execute(f"DELETE FROM carts WHERE user_id = {user_id}")
+        connect.commit()
+        connect.close()
         session.modified = True
         return redirect("/")
     except Exception as e:
@@ -180,8 +194,10 @@ def log_out():
     user_login = session["login"]
     try:
         connect, cursor = db_connect()
+        cursor.execute(f"SELECT id FROM users WHERE login='{user_login}'")
+        user_id = cursor.fetchall()[0][0]
         for key, value in session["cart"]["contents"].items():
-            cursor.execute(f"INSERT INTO carts VALUES ('', {key}, {value}, '{user_login}')")
+            cursor.execute(f"INSERT INTO carts VALUES ('', {int(key)}, {value}, {user_id})")
             connect.commit()
         connect.close()
     except Exception as e:
