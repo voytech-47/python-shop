@@ -22,7 +22,6 @@ def index(file="index.html"):
     return response
 
 
-@app.route('/api/sign_up', methods=["POST"])
 @app.route("/login")
 def login():
     note = ""
