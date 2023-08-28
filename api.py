@@ -22,6 +22,7 @@ def signup_api():
     hashing.update(password.encode("utf8"))
     hashed_password = hashing.hexdigest()
     insert_user_into_db(user_login, hashed_password)
+    log_in(user_login, password)
     session.modified = True
     return redirect("/")
 
